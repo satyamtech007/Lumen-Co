@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUMEN & CO. — Objects of Utility, Designed to Endure</title>
+  <meta name="description" content="Explore thoughtful acoustics, workspace essentials, and timeless lifestyle artifacts crafted for everyday longevity." />
+  
+  <!-- Modern Clean Sans-Serif Font: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <aside class="announcement-bar">
+    <div class="container announcement-inner">
+      <span class="announcement-text">✦ Complimentary worldwide carbon-neutral shipping on orders over $150 · 30-day effortless returns</span>
+    </div>
+  </aside>
+
+  <!-- Sticky Modern Navigation Bar -->
+  <header class="navbar" id="navbar">
+    <div class="container navbar-inner">
+      <!-- Brand Logo -->
+      <a href="#hero" class="brand-logo" aria-label="Lumen and Co Home">
+        <span class="brand-mark">L</span>
+        <span class="brand-text">LUMEN <span class="brand-sub">&amp; CO.</span></span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="#catalog" class="nav-link active">Catalog</a>
+        <a href="#catalog" data-filter="audio" class="nav-link">Audio</a>
+        <a href="#catalog" data-filter="workspace" class="nav-link">Workspace</a>
+        <a href="#catalog" data-filter="home" class="nav-link">Living</a>
+        <a href="#story" class="nav-link">Philosophy</a>
+        <a href="#reviews" class="nav-link">Reviews</a>
+      </nav>
+
+      <!-- Nav Actions -->
+      <div class="nav-actions">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="globalSearchInput" placeholder="Search catalog…" autocomplete="off" />
+        </div>
+
+        <!-- Manage Store Admin Button -->
+        <button id="manageStoreBtn" class="btn btn-secondary btn-sm admin-nav-btn" title="Manage Store Inventory (Passcode: lumen2026)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          <span>Manage Store</span>
+        </button>
+
+        <button id="cartToggleBtn" class="cart-btn" aria-label="Open Shopping Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span class="cart-label">Cart</span>
+          <span id="cartCountBadge" class="cart-count-badge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="hero">
+      <div class="container hero-inner">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-dot"></span>
+            <span>New 2026 Collection Released</span>
+          </div>
+          <h1 class="hero-title">Objects of Utility, Designed to Endure.</h1>
+          <p class="hero-description">
+            A considered collection of acoustic engineering, ergonomic desk artifacts, and sustainable lifestyle essentials. Meticulously tested for a lifetime of daily use.
+          </p>
+          <div class="hero-cta-group">
+            <a href="#catalog" class="btn btn-primary btn-lg">Explore Catalog</a>
+            <a href="#story" class="btn btn-secondary btn-lg">Our Philosophy</a>
+          </div>
+          <div class="hero-trust-metrics">
+            <div class="trust-metric">
+              <strong id="heroRatingDisplay">4.9 / 5</strong>
+              <span id="heroReviewsCountDisplay">from 2,400+ reviews</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="trust-metric">
+              <strong>2-Year</strong>
+              <span>complete warranty</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="trust-metric">
+              <strong>100%</strong>
+              <span>carbon neutral</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-image-card">
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1000&q=80" alt="Lumen Studio Wireless Headphones" class="hero-featured-img" />
+            <div class="hero-card-floating-tag">
+              <span class="tag-title">Studio Wireless</span>
+              <span class="tag-price">$249.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST STRIP -->
+    <section class="trust-strip">
+      <div class="container trust-strip-inner">
+        <div class="trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+          <div>
+            <h4>Worldwide Express</h4>
+            <p>Free tracked shipping over $150</p>
+          </div>
+        </div>
+
+        <div class="trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <div>
+            <h4>2-Year Warranty</h4>
+            <p>Guaranteed against defects</p>
+          </div>
+        </div>
+
+        <div class="trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <div>
+            <h4>30-Day Guarantee</h4>
+            <p>Effortless returns &amp; refunds</p>
+          </div>
+        </div>
+
+        <div class="trust-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+          </svg>
+          <div>
+            <h4>24/7 Concierge</h4>
+            <p>Dedicated customer support</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATALOG SECTION -->
+    <section class="catalog-section" id="catalog">
+      <div class="container">
+        
+        <!-- Section Header -->
+        <div class="section-header">
+          <div>
+            <span class="section-kicker">Curated Catalog</span>
+            <h2 class="section-title">Designed for Purpose &amp; Longevity</h2>
+          </div>
+          <p class="section-subtitle">Browse through our mixed collection of acoustics, workspace objects, and everyday carry essentials.</p>
+        </div>
+
+        <!-- Filter & Sorting Controls -->
+        <div class="catalog-controls">
+          <div class="category-pills" role="tablist" aria-label="Product categories">
+            <button class="pill active" data-category="all" role="tab" aria-selected="true">All Products</button>
+            <button class="pill" data-category="audio" role="tab" aria-selected="false">Audio &amp; Sound</button>
+            <button class="pill" data-category="workspace" role="tab" aria-selected="false">Workspace &amp; Desk</button>
+            <button class="pill" data-category="wearables" role="tab" aria-selected="false">Watches &amp; Wearables</button>
+            <button class="pill" data-category="home" role="tab" aria-selected="false">Living &amp; Lighting</button>
+            <button class="pill" data-category="lifestyle" role="tab" aria-selected="false">Travel &amp; Lifestyle</button>
+          </div>
+
+          <div class="sorting-wrapper">
+            <label for="sortSelect" class="sort-label">Sort by:</label>
+            <select id="sortSelect" class="sort-select">
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Highest Rated</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Product Grid Container -->
+        <div id="productGrid" class="product-grid">
+          <!-- Dynamically populated by app.js -->
+        </div>
+
+        <!-- Empty Results State -->
+        <div id="emptyCatalogState" class="empty-catalog hidden">
+          <div class="empty-icon">🔍</div>
+          <h3>No products match your selection</h3>
+          <p>Try resetting your search query or switching to another category.</p>
+          <button id="resetCatalogBtn" class="btn btn-secondary">Reset All Filters</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- BRAND STORY & CREDIBILITY SECTION -->
+    <section class="story-section" id="story">
+      <div class="container story-inner">
+        <div class="story-visual">
+          <img src="https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=900&q=80" alt="Lumen Craftsmanship Workshop" class="story-img" />
+          <div class="story-badge">
+            <span>Direct to Customer · No Wholesale Markups</span>
+          </div>
+        </div>
+
+        <div class="story-content">
+          <span class="section-kicker">Our Heritage &amp; Ethos</span>
+          <h2 class="section-title">Built with honest materials, not planned obsolescence.</h2>
+          <p>
+            At Lumen &amp; Co., we reject the fast-consumption cycle of modern retail. Every object in our catalog undergoes rigorous lifecycle testing — from custom beryllium acoustic drivers to solid brushed Grade 5 titanium.
+          </p>
+          <p>
+            We partner with generational artisans and precision engineering labs across Germany, Japan, and Italy to deliver industrial-grade artifacts straight to your door.
+          </p>
+
+          <div class="story-features-grid">
+            <div class="story-feature">
+              <div class="feature-bullet">01</div>
+              <div>
+                <h4>Zero Compromise Materials</h4>
+                <p>Natural vegetable-tanned leathers, aerospace titanium, and recyclable alloys.</p>
+              </div>
+            </div>
+            <div class="story-feature">
+              <div class="feature-bullet">02</div>
+              <div>
+                <h4>Honest Pricing</h4>
+                <p>By eliminating third-party retail distributors, we offer 3x higher build quality at accessible price points.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS & TESTIMONIALS SECTION -->
+    <section class="reviews-section" id="reviews">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="section-kicker">Verified Customer Stories</span>
+          <h2 class="section-title">Trusted by Design-Conscious Professionals</h2>
+        </div>
+
+        <div class="testimonials-grid" id="testimonialsGrid">
+          <!-- Dynamically populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWSLETTER CTA SECTION -->
+    <section class="newsletter-section">
+      <div class="container newsletter-card">
+        <div class="newsletter-content">
+          <span class="newsletter-badge">Luminary Access</span>
+          <h2 class="newsletter-title">Receive 10% off your inaugural order.</h2>
+          <p class="newsletter-subtitle">
+            Join 45,000+ patrons receiving our quarterly design dispatches, private studio previews, and exclusive members-only releases.
+          </p>
+          
+          <form id="newsletterForm" class="newsletter-form" novalidate>
+            <div class="form-input-wrap">
+              <input type="email" id="newsletterEmailInput" placeholder="Enter your email address…" required />
+              <button type="submit" class="btn btn-primary btn-newsletter">Subscribe</button>
+            </div>
+            <span id="newsletterValidationMsg" class="newsletter-msg"></span>
+          </form>
+          <p class="newsletter-footnote">Strict privacy. No spam. Unsubscribe at any time with a single click.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- STORE FOOTER -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-col brand-col">
+        <a href="#hero" class="brand-logo footer-logo">
+          <span class="brand-mark">L</span>
+          <span class="brand-text">LUMEN <span class="brand-sub">&amp; CO.</span></span>
+        </a>
+        <p class="footer-tagline">
+          Crafting tools of clarity and utility for discerning creators and modern spaces worldwide.
+        </p>
+        <div class="footer-copyright">
+          &copy; 2026 Lumen &amp; Co. All rights reserved. Commercial Prototype Store.
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Catalog</h4>
+        <ul class="footer-links">
+          <li><a href="#catalog" data-filter="audio">Acoustics &amp; Audio</a></li>
+          <li><a href="#catalog" data-filter="workspace">Workspace &amp; Desk</a></li>
+          <li><a href="#catalog" data-filter="wearables">Watches &amp; Wearables</a></li>
+          <li><a href="#catalog" data-filter="home">Living &amp; Lighting</a></li>
+          <li><a href="#catalog" data-filter="lifestyle">Travel &amp; Carry</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Customer Care</h4>
+        <ul class="footer-links">
+          <li><a href="javascript:void(0)" onclick="alert('Track Order: Orders are processed within 24 hours.')">Track Your Order</a></li>
+          <li><a href="javascript:void(0)" onclick="alert('Shipping Policy: Free worldwide express over $150.')">Shipping &amp; Duties</a></li>
+          <li><a href="javascript:void(0)" onclick="alert('Returns: 30-day effortless returns portal.')">Returns &amp; Exchanges</a></li>
+          <li><a href="javascript:void(0)" onclick="alert('Warranty: 2-Year comprehensive global coverage.')">Warranty Registration</a></li>
+          <li><a href="javascript:void(0)" onclick="alert('Support: Contact concierge@lumenandco.test')">Concierge Support</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Our Company</h4>
+        <ul class="footer-links">
+          <li><a href="#story">Our Design Ethos</a></li>
+          <li><a href="#story">Sustainability Pledges</a></li>
+          <li><a href="#reviews">Verified Reviews</a></li>
+          <li><a href="javascript:void(0)" id="footerAdminTrigger">Store Management (Admin)</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- PRODUCT DETAIL MODAL -->
+  <div id="productModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle">
+    <div class="product-modal-card">
+      <button id="closeProductModalBtn" class="modal-close-btn" aria-label="Close modal">✕</button>
+      
+      <div class="modal-product-grid">
+        <div class="modal-gallery">
+          <img id="modalProductImg" src="" alt="Product view" />
+        </div>
+
+        <div class="modal-info">
+          <div class="modal-category-badge" id="modalCategoryBadge"></div>
+          <h2 class="modal-title" id="modalProductTitle"></h2>
+          
+          <div class="modal-rating-row">
+            <div class="star-rating" id="modalStarRating"></div>
+            <span class="reviews-count" id="modalReviewsCount"></span>
+          </div>
+
+          <div class="modal-price-row">
+            <span class="modal-price" id="modalPrice"></span>
+            <span class="modal-original-price" id="modalOriginalPrice"></span>
+            <span class="stock-badge in-stock">In Stock — Ready to Ship</span>
+          </div>
+
+          <p class="modal-description" id="modalDescription"></p>
+
+          <div class="modal-specs">
+            <h4>Highlights &amp; Specifications:</h4>
+            <ul id="modalSpecsList"></ul>
+          </div>
+
+          <div class="modal-purchase-controls">
+            <div class="quantity-selector">
+              <button type="button" id="qtyMinusBtn" class="qty-btn" aria-label="Decrease quantity">−</button>
+              <input type="number" id="modalQtyInput" value="1" min="1" max="10" readonly />
+              <button type="button" id="qtyPlusBtn" class="qty-btn" aria-label="Increase quantity">+</button>
+            </div>
+
+            <button id="modalAddToCartBtn" class="btn btn-primary btn-add-cart">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+              </svg>
+              <span>Add to Cart</span>
+            </button>
+          </div>
+
+          <div class="modal-guarantee-strip">
+            <span>🛡️ 2-Year Full Coverage</span>
+            <span>⚡ Next Day Shipping</span>
+            <span>🔄 30-Day Home Trial</span>
+          </div>
+
+          <!-- Product Customer Reviews Section -->
+          <section class="modal-reviews-section">
+            <div class="modal-reviews-header">
+              <div class="reviews-summary-badge">
+                <h3 class="reviews-section-title">Customer Reviews (<span id="modalReviewsTotal">0</span>)</h3>
+                <div class="reviews-avg-rating">
+                  <span class="star-rating" id="modalReviewsAvgStars">★★★★★</span>
+                  <span id="modalReviewsAvgScore">5.0 / 5</span>
+                </div>
+              </div>
+              <button type="button" id="toggleWriteReviewBtn" class="btn btn-secondary btn-sm">Write a Review</button>
+            </div>
+
+            <!-- Write Review Form (Collapsible) -->
+            <form id="productReviewForm" class="review-submission-form hidden">
+              <h4 class="form-title">Share Your Experience</h4>
+              <div class="form-group">
+                <label>Your Rating</label>
+                <div class="interactive-star-selector" id="interactiveStarSelector">
+                  <span class="star-select-btn active" data-rating="1">★</span>
+                  <span class="star-select-btn active" data-rating="2">★</span>
+                  <span class="star-select-btn active" data-rating="3">★</span>
+                  <span class="star-select-btn active" data-rating="4">★</span>
+                  <span class="star-select-btn active" data-rating="5">★</span>
+                  <input type="hidden" id="reviewRatingVal" value="5" />
+                  <span class="star-rating-hint" id="starRatingHint">5.0 — Exceptional</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="reviewAuthorName">Your Full Name</label>
+                <input type="text" id="reviewAuthorName" placeholder="e.g. Alex Morgan" required />
+              </div>
+
+              <div class="form-group">
+                <label for="reviewComment">Written Review</label>
+                <textarea id="reviewComment" rows="3" placeholder="What did you think of the design, craftsmanship, and utility?" required></textarea>
+              </div>
+
+              <div class="review-form-actions">
+                <button type="button" id="cancelReviewBtn" class="btn btn-secondary btn-sm">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm">Submit Verified Review</button>
+              </div>
+            </form>
+
+            <!-- Reviews List Container -->
+            <div id="modalReviewsList" class="modal-reviews-list">
+              <!-- Dynamically rendered by app.js -->
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER SHOPPING CART DRAWER -->
+  <div id="cartDrawerBackdrop" class="cart-backdrop hidden"></div>
+  <aside id="cartDrawer" class="cart-drawer" aria-labelledby="cartDrawerTitle" aria-hidden="true">
+    <div class="cart-drawer-header">
+      <div class="cart-header-title">
+        <h3 id="cartDrawerTitle">Your Cart</h3>
+        <span id="cartDrawerCount" class="cart-header-badge">0 items</span>
+      </div>
+      <button id="closeCartBtn" class="btn-icon" aria-label="Close cart drawer">✕</button>
+    </div>
+
+    <!-- Free Shipping Progress Tracker -->
+    <div class="shipping-tracker">
+      <div class="tracker-text" id="shippingTrackerText">Add $150.00 to qualify for Free Global Shipping</div>
+      <div class="tracker-bar">
+        <div class="tracker-progress" id="shippingProgressBar" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <!-- Cart Items List -->
+    <div class="cart-items-container" id="cartItemsContainer">
+      <!-- Dynamically populated by app.js -->
+    </div>
+
+    <!-- Cart Empty State -->
+    <div id="cartEmptyState" class="cart-empty hidden">
+      <div class="empty-cart-icon">🛍️</div>
+      <h4>Your cart is currently empty</h4>
+      <p>Discover our curated collection of workspace and acoustic artifacts.</p>
+      <button id="cartStartShoppingBtn" class="btn btn-primary">Start Shopping</button>
+    </div>
+
+    <!-- Cart Footer & Summary -->
+    <div class="cart-drawer-footer" id="cartFooter">
+      <div class="promo-box">
+        <input type="text" id="promoCodeInput" placeholder="Promo code (e.g. LUMEN10)" />
+        <button id="applyPromoBtn" class="btn btn-secondary btn-sm">Apply</button>
+      </div>
+      <div id="promoFeedbackMsg" class="promo-msg"></div>
+
+      <div class="cart-summary-lines">
+        <div class="summary-line">
+          <span>Subtotal</span>
+          <span id="cartSubtotal">$0.00</span>
+        </div>
+        <div class="summary-line discount-line hidden" id="discountLine">
+          <span>Promotional Discount (10%)</span>
+          <span id="cartDiscount">-$0.00</span>
+        </div>
+        <div class="summary-line">
+          <span>Estimated Shipping</span>
+          <span id="cartShipping">Calculated next</span>
+        </div>
+        <div class="summary-line total-line">
+          <span>Estimated Total</span>
+          <span id="cartTotal" class="total-amount">$0.00</span>
+        </div>
+      </div>
+
+      <button id="proceedToCheckoutBtn" class="btn btn-primary btn-block btn-checkout">
+        <span>Proceed to Checkout</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+      <p class="secure-checkout-text">🔒 Encrypted 256-bit checkout simulated</p>
+    </div>
+  </aside>
+
+  <!-- MULTI-STEP CHECKOUT MODAL (GUEST FLOW) -->
+  <div id="checkoutModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="checkoutModalTitle">
+    <div class="checkout-modal-card">
+      <div class="checkout-modal-header">
+        <h3 id="checkoutModalTitle">Checkout</h3>
+        <button id="closeCheckoutBtn" class="modal-close-btn" aria-label="Cancel checkout">✕</button>
+      </div>
+
+      <!-- Checkout Stepper Progress -->
+      <div class="checkout-stepper">
+        <div class="step-item active" id="stepIndicator1">
+          <span class="step-number">1</span>
+          <span class="step-label">Shipping</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item" id="stepIndicator2">
+          <span class="step-number">2</span>
+          <span class="step-label">Payment</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item" id="stepIndicator3">
+          <span class="step-number">3</span>
+          <span class="step-label">Confirmation</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Shipping Info -->
+      <div class="checkout-step-panel" id="checkoutStep1">
+        <form id="shippingForm" class="checkout-form">
+          <h4 class="step-heading">Contact &amp; Delivery Address</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="shipEmail">Email Address</label>
+              <input type="email" id="shipEmail" placeholder="you@example.com" required />
+            </div>
+            <div class="form-group">
+              <label for="shipPhone">Phone Number</label>
+              <input type="tel" id="shipPhone" placeholder="+1 (555) 000-0000" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="shipFirstName">First Name</label>
+              <input type="text" id="shipFirstName" placeholder="Jane" required />
+            </div>
+            <div class="form-group">
+              <label for="shipLastName">Last Name</label>
+              <input type="text" id="shipLastName" placeholder="Doe" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="shipAddress">Street Address</label>
+            <input type="text" id="shipAddress" placeholder="1248 Design Boulevard, Apt 4B" required />
+          </div>
+
+          <div class="form-row three-col">
+            <div class="form-group">
+              <label for="shipCity">City</label>
+              <input type="text" id="shipCity" placeholder="San Francisco" required />
+            </div>
+            <div class="form-group">
+              <label for="shipState">State / Region</label>
+              <input type="text" id="shipState" placeholder="CA" required />
+            </div>
+            <div class="form-group">
+              <label for="shipZip">Postal Code</label>
+              <input type="text" id="shipZip" placeholder="94103" required />
+            </div>
+          </div>
+
+          <div class="checkout-actions">
+            <button type="button" id="backToCartBtn" class="btn btn-secondary">Back to Cart</button>
+            <button type="submit" class="btn btn-primary">Continue to Payment</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- STEP 2: Payment Simulation -->
+      <div class="checkout-step-panel hidden" id="checkoutStep2">
+        <form id="paymentForm" class="checkout-form">
+          <h4 class="step-heading">Simulated Payment Method</h4>
+          <div class="simulated-payment-badge">
+            <span>ℹ️ Demo Store Notice: No real card will be charged.</span>
+          </div>
+
+          <div class="payment-method-selector">
+            <label class="payment-option selected">
+              <input type="radio" name="paymentType" value="card" checked />
+              <span>Credit / Debit Card</span>
+              <div class="card-brand-icons">💳 🏛️ 💎</div>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label for="cardName">Cardholder Name</label>
+            <input type="text" id="cardName" placeholder="Jane Doe" required />
+          </div>
+
+          <div class="form-group">
+            <label for="cardNumber">Card Number</label>
+            <input type="text" id="cardNumber" placeholder="4532 •••• •••• 8924" maxlength="19" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cardExpiry">Expiration Date</label>
+              <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" required />
+            </div>
+            <div class="form-group">
+              <label for="cardCvc">Security Code (CVV)</label>
+              <input type="password" id="cardCvc" placeholder="•••" maxlength="4" required />
+            </div>
+          </div>
+
+          <!-- Checkout Order Total Preview -->
+          <div class="checkout-summary-box">
+            <div class="checkout-line">
+              <span>Final Amount Due:</span>
+              <strong id="checkoutFinalAmount">$0.00</strong>
+            </div>
+          </div>
+
+          <div class="checkout-actions">
+            <button type="button" id="backToShippingBtn" class="btn btn-secondary">Back to Shipping</button>
+            <button type="submit" id="completeOrderBtn" class="btn btn-primary btn-complete-order">
+              <span>Complete Mock Order</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- STEP 3: Order Confirmation -->
+      <div class="checkout-step-panel hidden" id="checkoutStep3">
+        <div class="order-confirmed-view">
+          <div class="success-checkmark-icon">✓</div>
+          <h3 class="confirmed-title">Order Confirmed!</h3>
+          <p class="confirmed-subtitle">
+            Thank you, <strong id="confirmedCustomerName">Jane</strong>! Your order <strong id="confirmedOrderId">#LMN-89241</strong> has been successfully placed.
+          </p>
+
+          <div class="order-receipt-card">
+            <div class="receipt-header">
+              <span>Order Details</span>
+              <span id="confirmedDate"></span>
+            </div>
+            <div class="receipt-items" id="confirmedItemsList">
+              <!-- Dynamically populated -->
+            </div>
+            <div class="receipt-total-row">
+              <span>Total Paid</span>
+              <span id="confirmedTotalAmount">$0.00</span>
+            </div>
+          </div>
+
+          <div class="delivery-estimate-card">
+            <div class="delivery-icon">📦</div>
+            <div>
+              <h4>Estimated Delivery</h4>
+              <p id="confirmedDeliveryDate">3–5 Business Days · Carbon-Neutral Express</p>
+            </div>
+          </div>
+
+          <button id="confirmedContinueBtn" class="btn btn-primary btn-block">Continue Shopping</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PASSCODE GATE MODAL -->
+  <div id="passcodeModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="passcodeModalTitle">
+    <div class="passcode-card">
+      <button id="closePasscodeModalBtn" class="modal-close-btn" aria-label="Close passcode modal">✕</button>
+      <div class="passcode-icon">🔒</div>
+      <h3 id="passcodeModalTitle">Store Administration</h3>
+      <p class="passcode-subtitle">Enter your store administrator passcode to manage inventory and create or edit products.</p>
+      
+      <form id="passcodeForm" class="passcode-form">
+        <div class="form-group">
+          <label for="adminPasscodeInput">Admin Passcode</label>
+          <input type="password" id="adminPasscodeInput" placeholder="Enter passcode…" autocomplete="off" required />
+        </div>
+        <div id="passcodeErrorMsg" class="passcode-error hidden">Incorrect passcode. Please try again.</div>
+        
+        <div class="passcode-actions">
+          <button type="button" id="closePasscodeBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Unlock Store</button>
+        </div>
+      </form>
+      <span class="passcode-hint">Demo Passcode: <code>lumen2026</code></span>
+    </div>
+  </div>
+
+  <!-- ADMIN MANAGE STORE MODAL -->
+  <div id="adminModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <div class="admin-header-title">
+          <span class="admin-badge">Admin Mode</span>
+          <h3 id="adminModalTitle">Store Inventory &amp; Catalog Management</h3>
+        </div>
+        <button id="closeAdminModalBtn" class="modal-close-btn" aria-label="Close admin modal">✕</button>
+      </div>
+
+      <div class="admin-tabs">
+        <button type="button" class="admin-tab active" id="tabInventoryBtn">Product Inventory (<span id="adminProductCount">0</span>)</button>
+        <button type="button" class="admin-tab" id="tabAddProductBtn">+ Add New Product</button>
+      </div>
+
+      <!-- TAB 1: Product Inventory List -->
+      <div class="admin-tab-panel" id="adminInventoryPanel">
+        <div class="admin-inventory-toolbar">
+          <input type="text" id="adminSearchInput" placeholder="Filter products by name or category…" />
+          <button type="button" id="adminQuickAddBtn" class="btn btn-primary btn-sm">+ Create Product</button>
+        </div>
+        
+        <div class="admin-table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Reviews &amp; Rating</th>
+                <th>Status</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminProductsTableBody">
+              <!-- Dynamically rendered by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: Add / Edit Product Form -->
+      <div class="admin-tab-panel hidden" id="adminProductFormPanel">
+        <form id="adminProductForm" class="admin-form">
+          <input type="hidden" id="editProductId" value="" />
+          <h4 id="productFormHeading" class="admin-form-heading">Create New Product</h4>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="adminProdName">Product Title *</label>
+              <input type="text" id="adminProdName" placeholder="e.g. Apex Titanium Mechanical Pen" required />
+            </div>
+            <div class="form-group">
+              <label for="adminProdCategory">Category *</label>
+              <select id="adminProdCategory" class="admin-select" required>
+                <option value="audio">Audio &amp; Sound</option>
+                <option value="workspace">Workspace &amp; Desk</option>
+                <option value="wearables">Watches &amp; Wearables</option>
+                <option value="home">Living &amp; Lighting</option>
+                <option value="lifestyle">Travel &amp; Lifestyle</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row three-col">
+            <div class="form-group">
+              <label for="adminProdPrice">Price ($ USD) *</label>
+              <input type="number" id="adminProdPrice" step="0.01" min="1" placeholder="89.00" required />
+            </div>
+            <div class="form-group">
+              <label for="adminProdOrigPrice">Original / Was Price ($)</label>
+              <input type="number" id="adminProdOrigPrice" step="0.01" min="1" placeholder="Optional strikethrough" />
+            </div>
+            <div class="form-group">
+              <label for="adminProdBadge">Badge (Optional)</label>
+              <input type="text" id="adminProdBadge" placeholder="e.g. Bestseller, New" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="adminProdTagline">Short Subtitle / Tagline *</label>
+            <input type="text" id="adminProdTagline" placeholder="e.g. Precision CNC-machined with pressurized ink cartridge" required />
+          </div>
+
+          <div class="form-group">
+            <label>Product Image (URL or File Upload) *</label>
+            <div class="image-upload-wrapper">
+              <input type="url" id="adminProdImageUrl" placeholder="https://images.unsplash.com/photo-..." />
+              <span class="upload-or">OR</span>
+              <label class="btn btn-secondary btn-sm upload-file-btn">
+                <span>Upload File</span>
+                <input type="file" id="adminProdImageFile" accept="image/*" class="visually-hidden" />
+              </label>
+            </div>
+            <div class="admin-image-preview-box hidden" id="adminImagePreviewBox">
+              <img id="adminImagePreview" src="" alt="Product preview" />
+              <span id="adminImageSrcLabel"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="adminProdDesc">Detailed Description *</label>
+            <textarea id="adminProdDesc" rows="3" placeholder="Comprehensive product story and utility narrative…" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="adminProdSpecs">Highlights &amp; Specifications (one per line)</label>
+            <textarea id="adminProdSpecs" rows="3" placeholder="Aerospace Grade 5 titanium body&#10;Includes Schmidt EasyFlow refill&#10;Integrated glass breaker tip"></textarea>
+          </div>
+
+          <div class="admin-form-actions">
+            <button type="button" id="adminCancelFormBtn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" id="adminSaveProductBtn" class="btn btn-primary">Save Product</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Global Toast Notification -->
+  <div id="toastNotification" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
