@@ -12,11 +12,14 @@
   --bg-surface-elevated: #ffffff;
   --bg-subtle: #f1f5f9;
   --bg-muted: #e2e8f0;
-  
+
   /* Text & Typographic Hierarchy */
-  --text-primary: #0f172a;       /* Slate 900 */
-  --text-secondary: #475569;     /* Slate 600 */
-  --text-muted: #94a3b8;         /* Slate 400 */
+  --text-primary: #0f172a;
+  /* Slate 900 */
+  --text-secondary: #475569;
+  /* Slate 600 */
+  --text-muted: #94a3b8;
+  /* Slate 400 */
   --text-inverted: #ffffff;
 
   /* Confident Primary Accent (Royal Indigo / Electric Blue) */
@@ -24,7 +27,7 @@
   --accent-hover: #1d4ed8;
   --accent-soft: #eff6ff;
   --accent-border: #bfdbfe;
-  
+
   /* Status Colors */
   --success-color: #059669;
   --success-soft: #ecfdf5;
@@ -59,7 +62,9 @@
 }
 
 /* --- Base & Reset --- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -101,7 +106,9 @@ ul {
   list-style: none;
 }
 
-button, input, select {
+button,
+input,
+select {
   font-family: inherit;
 }
 
@@ -283,10 +290,10 @@ button, input, select {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.65rem;
   background-color: var(--bg-surface);
   border: 1px solid var(--border-light);
-  padding: 0.5rem 0.9rem;
+  padding: 0.5rem 0.95rem;
   border-radius: var(--radius-full);
   cursor: pointer;
   color: var(--text-primary);
@@ -300,18 +307,31 @@ button, input, select {
   border-color: var(--border-subtle);
 }
 
-.cart-count-badge {
+.cart-icon-wrapper {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
+  line-height: 1;
+}
+
+.cart-count-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
   background-color: var(--accent-primary);
   color: #ffffff;
   border-radius: var(--radius-full);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
+  line-height: 1;
+  border: 2px solid var(--bg-surface);
   transition: transform var(--transition-fast);
 }
 
@@ -321,9 +341,17 @@ button, input, select {
 }
 
 @keyframes badgePop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.4); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.35);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* --- Buttons System --- */
@@ -832,7 +860,8 @@ button, input, select {
 }
 
 .star-rating {
-  color: #f59e0b; /* Amber */
+  color: #f59e0b;
+  /* Amber */
   letter-spacing: 1px;
 }
 
@@ -1080,7 +1109,8 @@ button, input, select {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: #93c5fd; /* Soft light blue */
+  color: #93c5fd;
+  /* Soft light blue */
   margin-bottom: 0.85rem;
 }
 
@@ -1666,8 +1696,13 @@ button, input, select {
   margin-bottom: 0.75rem;
 }
 
-.promo-msg.success { color: var(--success-color); }
-.promo-msg.error { color: var(--danger-color); }
+.promo-msg.success {
+  color: var(--success-color);
+}
+
+.promo-msg.error {
+  color: var(--danger-color);
+}
 
 .cart-summary-lines {
   display: flex;
@@ -2031,13 +2066,25 @@ button, input, select {
 
 /* --- Animations --- */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes modalScale {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* --- Admin Navbar Button --- */
@@ -2118,7 +2165,8 @@ button, input, select {
   user-select: none;
 }
 
-.star-select-btn.active, .star-select-btn.hover {
+.star-select-btn.active,
+.star-select-btn.hover {
   color: #f59e0b;
 }
 
@@ -2592,8 +2640,8 @@ button, input, select {
   filter: blur(0);
   /* 0.85s-0.9s duration with smooth ease-out curve and per-character stagger delay */
   transition: transform 850ms cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 800ms cubic-bezier(0.16, 1, 0.3, 1),
-              filter 750ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 800ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 750ms cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: var(--delay, 0s);
 }
 
@@ -2608,7 +2656,9 @@ button, input, select {
 
 /* --- Responsive Breakpoints --- */
 @media (max-width: 960px) {
-  .hero-inner, .story-inner {
+
+  .hero-inner,
+  .story-inner {
     grid-template-columns: 1fr;
     gap: 2.5rem;
   }
@@ -2662,7 +2712,9 @@ button, input, select {
     align-items: flex-start;
   }
 
-  .form-row, .form-row.three-col, .story-features-grid {
+  .form-row,
+  .form-row.three-col,
+  .story-features-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2672,5 +2724,109 @@ button, input, select {
 
   .form-input-wrap {
     flex-direction: column;
+  }
+}
+
+/* ==========================================================================
+   MAGNETIC CURSOR (Inspired by 21st.dev MagneticCursor)
+   Physics, Velocity Stretch, Smart Contrast Exclusion & Magnetic Snapping
+   ========================================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+
+  body.has-custom-cursor,
+  body.has-custom-cursor a,
+  body.has-custom-cursor button,
+  body.has-custom-cursor [data-magnetic],
+  body.has-custom-cursor .pill,
+  body.has-custom-cursor .cart-btn,
+  body.has-custom-cursor .btn {
+    cursor: none !important;
+  }
+
+  body.has-custom-cursor input,
+  body.has-custom-cursor textarea,
+  body.has-custom-cursor select {
+    cursor: text !important;
+  }
+
+  .magnetic-cursor-follower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+    margin-left: -20px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    mix-blend-mode: exclusion;
+    pointer-events: none !important;
+    z-index: 9999999;
+    opacity: 0;
+    transform: translate3d(-100px, -100px, 0);
+    transition: opacity 0.25s ease,
+      width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+      height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+      margin 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, width, height, opacity;
+  }
+
+  .magnetic-cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    margin-top: -3px;
+    margin-left: -3px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    mix-blend-mode: exclusion;
+    pointer-events: none !important;
+    z-index: 10000000;
+    opacity: 0;
+    transform: translate3d(-100px, -100px, 0);
+    transition: opacity 0.2s ease;
+    will-change: transform, opacity;
+  }
+
+  .magnetic-cursor-follower.is-active,
+  .magnetic-cursor-dot.is-active {
+    opacity: 1;
+  }
+
+  .magnetic-cursor-follower.is-hovering {
+    width: 62px;
+    height: 62px;
+    margin-top: -31px;
+    margin-left: -31px;
+  }
+
+  .magnetic-cursor-follower.is-text-input {
+    width: 10px;
+    height: 10px;
+    margin-top: -5px;
+    margin-left: -5px;
+    opacity: 0.3;
+  }
+
+  .magnetic-cursor-dot.is-text-input {
+    opacity: 0;
+  }
+
+  [data-magnetic] {
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+    display: inline-block;
+  }
+}
+
+/* Fallback for touch & mobile devices */
+@media (hover: none) or (pointer: coarse) {
+
+  .magnetic-cursor-follower,
+  .magnetic-cursor-dot {
+    display: none !important;
   }
 }
