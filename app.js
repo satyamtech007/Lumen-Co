@@ -14,6 +14,8 @@
   // --- Constants & Storage Keys ---
   const STORAGE_KEY_CART = 'lumen_cart_v2';
   const STORAGE_KEY_PRODUCTS = 'lumen_products_v2';
+  const STORAGE_KEY_PROFILE = 'lumen_profile_v1';
+  const STORAGE_KEY_ORDERS = 'lumen_orders_v1';
   const ADMIN_PASSCODE = 'lumen2026';
   const FREE_SHIPPING_THRESHOLD = 150.00;
   const STANDARD_SHIPPING_RATE = 15.00;
@@ -22,6 +24,101 @@
     'WELCOME10': 0.10,
     'DESIGN20': 0.20
   };
+
+  const TRACKING_STAGES = [
+    {
+      key: 'confirmed',
+      label: 'Order Confirmed',
+      detail: 'Payment verified and order registered in our dispatch queue.'
+    },
+    {
+      key: 'packed',
+      label: 'Packed & Quality Checked',
+      detail: 'Each piece passed bench inspection and was sealed in FSC packaging.'
+    },
+    {
+      key: 'transit',
+      label: 'In Transit',
+      detail: 'Departed fulfillment studio via Carbon-Neutral Express linehaul.'
+    },
+    {
+      key: 'out_for_delivery',
+      label: 'Out for Delivery',
+      detail: 'With local courier partner for doorstep handoff today.'
+    },
+    {
+      key: 'delivered',
+      label: 'Delivered',
+      detail: 'Package signed and delivered to recipient address.'
+    }
+  ];
+
+  const FAQ_DATA = [
+    {
+      id: 'faq-web-profile',
+      category: 'website',
+      question: 'Where can I view or update my customer profile?',
+      answer: 'Click the Account button in the top navigation bar (or "My Profile" in the footer) to open the Patron Portal. You can save your name, email, phone, and default 6-digit PIN delivery address, which will automatically pre-fill future checkouts.',
+      actionLabel: 'Open My Profile',
+      actionType: 'profile'
+    },
+    {
+      id: 'faq-web-theme',
+      category: 'website',
+      question: 'How does the Ink Bleed dark and light theme switcher work?',
+      answer: 'Click the sun/moon icon in the navbar or press the T key anywhere outside text inputs to trigger the WebGL2 ink-bleed transition between crisp Daylight Mode and Deep Obsidian Dark Mode. Your preference is saved automatically.',
+      actionLabel: null,
+      actionType: null
+    },
+    {
+      id: 'faq-web-admin',
+      category: 'website',
+      question: 'How do I test Store Management or promo codes?',
+      answer: 'Click "Manage Store" in the navigation bar and enter passcode "lumen2026" to add or edit products in real time. In the cart drawer, try promo codes LUMEN10 (10% off), WELCOME10 (10% off), or DESIGN20 (20% off).',
+      actionLabel: null,
+      actionType: null
+    },
+    {
+      id: 'faq-orders-view',
+      category: 'orders',
+      question: 'Where can I see my placed orders and receipts?',
+      answer: 'Open Account -> Placed Orders in the top navigation bar (or "Placed Orders" in the footer) to inspect every completed order, including its #LMN-XXXXX ID, itemized products, payment totals, delivery address, and a one-click Track Status button.',
+      actionLabel: 'View Placed Orders',
+      actionType: 'orders'
+    },
+    {
+      id: 'faq-orders-pin',
+      category: 'orders',
+      question: 'Why does checkout require an exact 6-digit PIN / postal code?',
+      answer: 'Our express dispatch validation requires a 6-digit numeric postal PIN so courier routing and estimated delivery windows remain accurate. Non-numeric characters are filtered out and input is capped at 6 digits in both Profile and Checkout.',
+      actionLabel: null,
+      actionType: null
+    },
+    {
+      id: 'faq-orders-returns',
+      category: 'orders',
+      question: 'What is the shipping, returns, and 2-year warranty policy?',
+      answer: 'Orders over $150 qualify for free Carbon-Neutral Express shipping (otherwise $15 flat rate). Every piece includes a 30-day effortless return window and a 2-Year comprehensive global warranty against manufacturing defects.',
+      actionLabel: null,
+      actionType: null
+    },
+    {
+      id: 'faq-track-how',
+      category: 'tracking',
+      question: 'How do I track the live delivery status of a placed order?',
+      answer: 'Immediately after placing an order you can click "Track Order Status" on the confirmation screen, or open Account -> Placed Orders and click "Track Status" on any order card. You can also enter an #LMN-XXXXX Order ID directly in the Track Status tab.',
+      actionLabel: 'Open Track Status',
+      actionType: 'track'
+    },
+    {
+      id: 'faq-track-stages',
+      category: 'tracking',
+      question: 'What are the 5 tracking milestones and can I test status updates?',
+      answer: 'Shipments progress through Order Confirmed, Packed & Quality Checked, In Transit, Out for Delivery, and Delivered. Inside the Track Status view, click "Simulate Next Milestone" to step an order through live delivery stages.',
+      actionLabel: 'Track Latest Order',
+      actionType: 'track'
+    }
+  ];
 
   const CATEGORY_MAP = {
     'audio': 'Audio & Sound',
@@ -36,6 +133,23 @@
     products: [],
     testimonials: typeof TESTIMONIALS_DATA !== 'undefined' ? TESTIMONIALS_DATA : [],
     cart: [],
+    profile: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      address: '',
+      city: '',
+      state: '',
+      zip: '',
+      updatedAt: null
+    },
+    orders: [],
+    activeAccountTab: 'profile',
+    activeTrackingOrderId: null,
+    lastPlacedOrderId: null,
+    activeFaqCategory: 'all',
+    openFaqIds: new Set(['faq-web-profile']),
     selectedCategory: 'all',
     currentSection: 'catalog',
     searchQuery: '',
@@ -185,6 +299,54 @@
     confirmedItemsList: document.getElementById('confirmedItemsList'),
     confirmedTotalAmount: document.getElementById('confirmedTotalAmount'),
     confirmedContinueBtn: document.getElementById('confirmedContinueBtn'),
+    confirmedTrackBtn: document.getElementById('confirmedTrackBtn'),
+
+    // Account Portal Modal (Profile / Placed Orders / Track Status)
+    accountBtn: document.getElementById('accountBtn'),
+    navProfileName: document.getElementById('navProfileName'),
+    ordersCountBadge: document.getElementById('ordersCountBadge'),
+    accountModal: document.getElementById('accountModal'),
+    closeAccountBtn: document.getElementById('closeAccountBtn'),
+    accountTabs: document.querySelectorAll('.account-tab'),
+    accountProfileTab: document.getElementById('accountProfileTab'),
+    accountOrdersTab: document.getElementById('accountOrdersTab'),
+    accountTrackTab: document.getElementById('accountTrackTab'),
+    ordersTabCount: document.getElementById('ordersTabCount'),
+
+    // Profile Form & Summary
+    profileAvatarInitials: document.getElementById('profileAvatarInitials'),
+    profileDisplayName: document.getElementById('profileDisplayName'),
+    profileDisplayEmail: document.getElementById('profileDisplayEmail'),
+    profileOrdersStat: document.getElementById('profileOrdersStat'),
+    profileSpentStat: document.getElementById('profileSpentStat'),
+    profileForm: document.getElementById('profileForm'),
+    profileFirstName: document.getElementById('profileFirstName'),
+    profileLastName: document.getElementById('profileLastName'),
+    profileEmail: document.getElementById('profileEmail'),
+    profilePhone: document.getElementById('profilePhone'),
+    profileAddress: document.getElementById('profileAddress'),
+    profileCity: document.getElementById('profileCity'),
+    profileState: document.getElementById('profileState'),
+    profileZip: document.getElementById('profileZip'),
+    clearProfileBtn: document.getElementById('clearProfileBtn'),
+
+    // Placed Orders & Track Status
+    ordersListContainer: document.getElementById('ordersListContainer'),
+    ordersOpenTrackBtn: document.getElementById('ordersOpenTrackBtn'),
+    trackOrderForm: document.getElementById('trackOrderForm'),
+    trackOrderInput: document.getElementById('trackOrderInput'),
+    trackQuickChips: document.getElementById('trackQuickChips'),
+    trackResultContainer: document.getElementById('trackResultContainer'),
+
+    // FAQ & Footer Triggers
+    faqFilterButtons: document.querySelectorAll('[data-faq-cat]'),
+    faqAccordionList: document.getElementById('faqAccordionList'),
+    faqOpenProfileBtn: document.getElementById('faqOpenProfileBtn'),
+    faqOpenOrdersBtn: document.getElementById('faqOpenOrdersBtn'),
+    faqOpenTrackBtn: document.getElementById('faqOpenTrackBtn'),
+    footerProfileTrigger: document.getElementById('footerProfileTrigger'),
+    footerOrdersTrigger: document.getElementById('footerOrdersTrigger'),
+    footerTrackTrigger: document.getElementById('footerTrackTrigger'),
 
     // Toast
     toastNotification: document.getElementById('toastNotification'),
@@ -346,7 +508,7 @@
       html += `
         <article class="product-card" data-id="${product.id}">
           <div class="product-card-media" data-action="view-details" data-id="${product.id}">
-            <img src="${product.image}" alt="${escapeHtml(product.name)}" class="product-card-img" loading="lazy" />
+            <img src="${product.image}" alt="${escapeHtml(product.name)}" class="product-card-img"${imgCorsAttr(product.image)} />
             ${badgeHtml}
             <button class="btn-quick-view" data-action="view-details" data-id="${product.id}">Quick View</button>
           </div>
@@ -390,6 +552,7 @@
 
     setupScrollReveal();
     updateHeroTrustMetrics();
+    notifyInkInvalidate();
   }
 
   function setupScrollReveal() {
@@ -420,7 +583,7 @@
         <div class="testimonial-card">
           <p class="testimonial-quote">“${t.quote}”</p>
           <div class="testimonial-author-row">
-            <img src="${t.avatar}" alt="${t.author}" class="author-avatar" loading="lazy" />
+            <img src="${t.avatar}" alt="${t.author}" class="author-avatar"${imgCorsAttr(t.avatar)} />
             <div class="author-info">
               <h4>${t.author}</h4>
               <span>${t.role}</span>
@@ -438,6 +601,11 @@
     if (!product) return;
 
     state.activeModalProduct = product;
+    if (product.image && product.image.includes('images.unsplash.com')) {
+      dom.modalProductImg.crossOrigin = 'anonymous';
+    } else {
+      dom.modalProductImg.removeAttribute('crossorigin');
+    }
     dom.modalProductImg.src = product.image;
     dom.modalProductImg.alt = product.name;
     dom.modalCategoryBadge.textContent = product.categoryLabel || CATEGORY_MAP[product.category] || 'Collection';
@@ -475,11 +643,13 @@
     renderModalReviews(product);
 
     dom.productModal.classList.remove('hidden');
+    notifyInkInvalidate(80);
   }
 
   function closeProductModal() {
     dom.productModal.classList.add('hidden');
     state.activeModalProduct = null;
+    notifyInkInvalidate(80);
   }
 
   function renderModalReviews(product) {
@@ -602,10 +772,12 @@
     dom.passcodeErrorMsg.classList.add('hidden');
     dom.passcodeModal.classList.remove('hidden');
     setTimeout(() => dom.adminPasscodeInput.focus(), 150);
+    notifyInkInvalidate(80);
   }
 
   function closePasscodePrompt() {
     dom.passcodeModal.classList.add('hidden');
+    notifyInkInvalidate(80);
   }
 
   function handlePasscodeSubmit(e) {
@@ -626,11 +798,13 @@
     renderAdminInventoryTable();
     switchAdminTab('inventory');
     dom.adminModal.classList.remove('hidden');
+    notifyInkInvalidate(80);
   }
 
   function closeAdminModal() {
     dom.adminModal.classList.add('hidden');
     resetAdminForm();
+    notifyInkInvalidate(80);
   }
 
   function switchAdminTab(tabName) {
@@ -671,7 +845,7 @@
         <tr>
           <td>
             <div class="admin-prod-cell">
-              <img src="${product.image}" alt="${escapeHtml(product.name)}" class="admin-prod-thumb" />
+              <img src="${product.image}" alt="${escapeHtml(product.name)}" class="admin-prod-thumb"${imgCorsAttr(product.image)} />
               <div>
                 <div class="admin-prod-title">${escapeHtml(product.name)}</div>
                 <small class="text-muted">${escapeHtml(product.tagline || '')}</small>
@@ -963,7 +1137,7 @@
       const lineTotal = item.product.price * item.qty;
       html += `
         <div class="cart-item" data-id="${item.id}">
-          <img src="${item.product.image}" alt="${escapeHtml(item.product.name)}" class="cart-item-img" />
+          <img src="${item.product.image}" alt="${escapeHtml(item.product.name)}" class="cart-item-img"${imgCorsAttr(item.product.image)} />
           <div class="cart-item-info">
             <div class="cart-item-header">
               <h4 class="cart-item-title">${escapeHtml(item.product.name)}</h4>
@@ -1006,18 +1180,21 @@
 
     dom.cartShipping.textContent = subtotal === 0 ? '$0.00' : (shipping === 0 ? 'FREE' : formatCurrency(shipping));
     dom.cartTotal.textContent = formatCurrency(total);
+    notifyInkInvalidate();
   }
 
   function openCartDrawer() {
     dom.cartDrawerBackdrop.classList.remove('hidden');
     dom.cartDrawer.classList.add('open');
     dom.cartDrawer.setAttribute('aria-hidden', 'false');
+    notifyInkInvalidate(300);
   }
 
   function closeCartDrawer() {
     dom.cartDrawerBackdrop.classList.add('hidden');
     dom.cartDrawer.classList.remove('open');
     dom.cartDrawer.setAttribute('aria-hidden', 'true');
+    notifyInkInvalidate(300);
   }
 
   // --- Promo Code Application ---
@@ -1039,6 +1216,33 @@
   }
 
   // --- 3-Step Checkout Modal Flow ---
+  function sanitizeZip(value) {
+    return String(value || '').replace(/\D/g, '').slice(0, 6);
+  }
+
+  function prefillCheckoutFromProfile() {
+    const p = state.profile;
+    if (!p) return;
+
+    const fieldMap = [
+      ['shipEmail', p.email],
+      ['shipPhone', p.phone],
+      ['shipFirstName', p.firstName],
+      ['shipLastName', p.lastName],
+      ['shipAddress', p.address],
+      ['shipCity', p.city],
+      ['shipState', p.state],
+      ['shipZip', sanitizeZip(p.zip)]
+    ];
+
+    fieldMap.forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && !el.value.trim() && val) {
+        el.value = val;
+      }
+    });
+  }
+
   function openCheckout() {
     if (state.cart.length === 0) {
       showToast('Your cart is empty');
@@ -1046,6 +1250,7 @@
     }
 
     closeCartDrawer();
+    prefillCheckoutFromProfile();
     setCheckoutStep(1);
     
     // Update summary preview
@@ -1053,10 +1258,12 @@
     dom.checkoutFinalAmount.textContent = formatCurrency(total);
 
     dom.checkoutModal.classList.remove('hidden');
+    notifyInkInvalidate(80);
   }
 
   function closeCheckout() {
     dom.checkoutModal.classList.add('hidden');
+    notifyInkInvalidate(80);
   }
 
   function setCheckoutStep(stepNumber) {
@@ -1085,18 +1292,46 @@
 
   function handleShippingSubmit(e) {
     e.preventDefault();
+    const zipInput = document.getElementById('shipZip');
+    const cleanZip = zipInput ? sanitizeZip(zipInput.value) : '';
+    if (zipInput) zipInput.value = cleanZip;
+    if (cleanZip.length !== 6) {
+      showToast('Please enter a valid 6-digit PIN / postal code');
+      if (zipInput) zipInput.focus();
+      return;
+    }
+
     state.checkoutShippingInfo = {
-      email: document.getElementById('shipEmail').value,
-      phone: document.getElementById('shipPhone').value,
-      firstName: document.getElementById('shipFirstName').value,
-      lastName: document.getElementById('shipLastName').value,
-      address: document.getElementById('shipAddress').value,
-      city: document.getElementById('shipCity').value,
-      state: document.getElementById('shipState').value,
-      zip: document.getElementById('shipZip').value,
+      email: document.getElementById('shipEmail').value.trim(),
+      phone: document.getElementById('shipPhone').value.trim(),
+      firstName: document.getElementById('shipFirstName').value.trim(),
+      lastName: document.getElementById('shipLastName').value.trim(),
+      address: document.getElementById('shipAddress').value.trim(),
+      city: document.getElementById('shipCity').value.trim(),
+      state: document.getElementById('shipState').value.trim(),
+      zip: cleanZip,
     };
 
     setCheckoutStep(2);
+  }
+
+  function formatEstimatedDeliveryDate(daysOffset = 4) {
+    const dt = new Date();
+    dt.setDate(dt.getDate() + daysOffset);
+    return dt.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  function formatTimestampShort(dateObj = new Date()) {
+    return dateObj.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   function handlePaymentSubmit(e) {
@@ -1114,25 +1349,79 @@
 
       // Complete Order
       const orderNumber = 'LMN-' + Math.floor(10000 + Math.random() * 90000);
-      const { total } = calculateCartTotals();
-      const customerName = state.checkoutShippingInfo ? state.checkoutShippingInfo.firstName : 'Valued Patron';
-
-      dom.confirmedCustomerName.textContent = customerName;
-      dom.confirmedOrderId.textContent = `#${orderNumber}`;
-      dom.confirmedDate.textContent = new Date().toLocaleDateString('en-US', {
+      const { subtotal, discount, shipping, total } = calculateCartTotals();
+      const shippingInfo = state.checkoutShippingInfo || {};
+      const customerName = shippingInfo.firstName || 'Valued Patron';
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric'
       });
+
+      const orderItems = state.cart.map((item) => ({
+        id: item.id,
+        name: item.product.name,
+        price: item.product.price,
+        qty: item.qty,
+        image: item.product.image
+      }));
+
+      const newOrder = {
+        id: orderNumber,
+        trackingCode: 'TRK-' + orderNumber,
+        carrier: 'Lumen Carbon-Neutral Express',
+        createdAt: now.toISOString(),
+        placedDate: dateStr,
+        estimatedDelivery: `${formatEstimatedDeliveryDate(4)} · Carbon-Neutral Express`,
+        customerName: [shippingInfo.firstName, shippingInfo.lastName].filter(Boolean).join(' ') || customerName,
+        shippingInfo: { ...shippingInfo },
+        items: orderItems,
+        subtotal,
+        discount,
+        shipping,
+        total,
+        promoCode: state.appliedPromo || null,
+        statusStage: 0,
+        stageTimestamps: [formatTimestampShort(now)]
+      };
+
+      state.orders.unshift(newOrder);
+      state.lastPlacedOrderId = newOrder.id;
+      state.activeTrackingOrderId = newOrder.id;
+      saveOrdersToStorage();
+
+      // Sync customer shipping info into Profile if provided
+      if (shippingInfo.firstName || shippingInfo.email) {
+        state.profile = {
+          firstName: shippingInfo.firstName || state.profile.firstName,
+          lastName: shippingInfo.lastName || state.profile.lastName,
+          email: shippingInfo.email || state.profile.email,
+          phone: shippingInfo.phone || state.profile.phone,
+          address: shippingInfo.address || state.profile.address,
+          city: shippingInfo.city || state.profile.city,
+          state: shippingInfo.state || state.profile.state,
+          zip: sanitizeZip(shippingInfo.zip || state.profile.zip),
+          updatedAt: now.toISOString()
+        };
+        saveProfileToStorage();
+      }
+
+      dom.confirmedCustomerName.textContent = customerName;
+      dom.confirmedOrderId.textContent = `#${orderNumber}`;
+      dom.confirmedDate.textContent = dateStr;
       dom.confirmedTotalAmount.textContent = formatCurrency(total);
+
+      const estEl = document.getElementById('confirmedDeliveryDate');
+      if (estEl) estEl.textContent = newOrder.estimatedDelivery;
 
       // Receipt items
       let receiptHtml = '';
-      state.cart.forEach((item) => {
+      orderItems.forEach((item) => {
         receiptHtml += `
           <div class="receipt-item-row">
-            <span>${escapeHtml(item.product.name)} (×${item.qty})</span>
-            <strong>${formatCurrency(item.product.price * item.qty)}</strong>
+            <span>${escapeHtml(item.name)} (×${item.qty})</span>
+            <strong>${formatCurrency(item.price * item.qty)}</strong>
           </div>
         `;
       });
@@ -1143,10 +1432,587 @@
       state.appliedPromo = null;
       saveCartToStorage();
       updateCartUI();
+      updateAccountSummaryUI();
 
       setCheckoutStep(3);
+      notifyInkInvalidate(80);
       showToast('Order successfully confirmed!');
     }, 900);
+  }
+
+  // --- Customer Profile, Placed Orders & Track Status ---
+  function loadProfileFromStorage() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_PROFILE);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          state.profile = {
+            ...state.profile,
+            ...parsed,
+            zip: sanitizeZip(parsed.zip)
+          };
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read profile from localStorage', e);
+    }
+  }
+
+  function saveProfileToStorage() {
+    try {
+      localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(state.profile));
+    } catch (e) {
+      console.warn('Could not save profile to localStorage', e);
+    }
+  }
+
+  function loadOrdersFromStorage() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_ORDERS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          state.orders = parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read orders from localStorage', e);
+    }
+  }
+
+  function saveOrdersToStorage() {
+    try {
+      localStorage.setItem(STORAGE_KEY_ORDERS, JSON.stringify(state.orders));
+    } catch (e) {
+      console.warn('Could not save orders to localStorage', e);
+    }
+  }
+
+  function getProfileInitials() {
+    const first = (state.profile.firstName || '').trim();
+    const last = (state.profile.lastName || '').trim();
+    if (first && last) return (first[0] + last[0]).toUpperCase();
+    if (first) return first.slice(0, 2).toUpperCase();
+    return 'LP';
+  }
+
+  function updateAccountSummaryUI() {
+    const orderCount = state.orders.length;
+    const totalSpent = state.orders.reduce((sum, ord) => sum + (Number(ord.total) || 0), 0);
+    const fullName = [state.profile.firstName, state.profile.lastName].filter(Boolean).join(' ').trim();
+
+    if (dom.navProfileName) {
+      dom.navProfileName.textContent = (state.profile.firstName || '').trim() || 'Account';
+    }
+
+    if (dom.ordersCountBadge) {
+      dom.ordersCountBadge.textContent = orderCount;
+      if (orderCount > 0) {
+        dom.ordersCountBadge.classList.remove('hidden');
+      } else {
+        dom.ordersCountBadge.classList.add('hidden');
+      }
+    }
+
+    if (dom.ordersTabCount) {
+      dom.ordersTabCount.textContent = orderCount;
+    }
+
+    if (dom.profileAvatarInitials) {
+      dom.profileAvatarInitials.textContent = getProfileInitials();
+    }
+    if (dom.profileDisplayName) {
+      dom.profileDisplayName.textContent = fullName || 'Lumen Patron';
+    }
+    if (dom.profileDisplayEmail) {
+      if (state.profile.email) {
+        const locationSuffix = state.profile.city && state.profile.zip
+          ? ` · ${state.profile.city}, ${state.profile.zip}`
+          : '';
+        dom.profileDisplayEmail.textContent = `${state.profile.email}${locationSuffix}`;
+      } else {
+        dom.profileDisplayEmail.textContent = 'Save your contact details and 6-digit PIN for faster checkout.';
+      }
+    }
+    if (dom.profileOrdersStat) {
+      dom.profileOrdersStat.textContent = orderCount;
+    }
+    if (dom.profileSpentStat) {
+      dom.profileSpentStat.textContent = formatCurrency(totalSpent);
+    }
+  }
+
+  function renderProfileTab() {
+    updateAccountSummaryUI();
+    if (!dom.profileForm) return;
+    dom.profileFirstName.value = state.profile.firstName || '';
+    dom.profileLastName.value = state.profile.lastName || '';
+    dom.profileEmail.value = state.profile.email || '';
+    dom.profilePhone.value = state.profile.phone || '';
+    dom.profileAddress.value = state.profile.address || '';
+    dom.profileCity.value = state.profile.city || '';
+    dom.profileState.value = state.profile.state || '';
+    dom.profileZip.value = sanitizeZip(state.profile.zip);
+  }
+
+  function handleProfileSubmit(e) {
+    e.preventDefault();
+    const cleanZip = sanitizeZip(dom.profileZip.value);
+    dom.profileZip.value = cleanZip;
+
+    if (cleanZip.length !== 6) {
+      showToast('Please enter a valid 6-digit PIN / postal code');
+      dom.profileZip.focus();
+      return;
+    }
+
+    state.profile = {
+      firstName: dom.profileFirstName.value.trim(),
+      lastName: dom.profileLastName.value.trim(),
+      email: dom.profileEmail.value.trim(),
+      phone: dom.profilePhone.value.trim(),
+      address: dom.profileAddress.value.trim(),
+      city: dom.profileCity.value.trim(),
+      state: dom.profileState.value.trim(),
+      zip: cleanZip,
+      updatedAt: new Date().toISOString()
+    };
+
+    saveProfileToStorage();
+    updateAccountSummaryUI();
+    notifyInkInvalidate(60);
+    showToast('Profile saved! Checkout will pre-fill these details.');
+  }
+
+  function clearSavedProfile() {
+    state.profile = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      address: '',
+      city: '',
+      state: '',
+      zip: '',
+      updatedAt: null
+    };
+    saveProfileToStorage();
+    renderProfileTab();
+    notifyInkInvalidate(60);
+    showToast('Saved profile cleared');
+  }
+
+  function renderPlacedOrders() {
+    if (!dom.ordersListContainer) return;
+
+    if (state.orders.length === 0) {
+      dom.ordersListContainer.innerHTML = `
+        <div class="account-empty-state">
+          <h4>No placed orders yet</h4>
+          <p>Once you complete checkout, every order appears here with itemized receipts and a live Track Status option.</p>
+          <button type="button" class="btn btn-primary btn-sm" id="emptyOrdersBrowseBtn">Explore Catalog</button>
+        </div>
+      `;
+      const browseBtn = document.getElementById('emptyOrdersBrowseBtn');
+      if (browseBtn) {
+        browseBtn.addEventListener('click', () => {
+          closeAccountModal();
+          const catalogEl = document.getElementById('catalog');
+          if (catalogEl) catalogEl.scrollIntoView({ behavior: 'smooth' });
+        });
+      }
+      return;
+    }
+
+    let html = '';
+    state.orders.forEach((order) => {
+      const stageIdx = Math.min(Math.max(Number(order.statusStage) || 0, 0), TRACKING_STAGES.length - 1);
+      const currentStage = TRACKING_STAGES[stageIdx];
+      const isDelivered = stageIdx === TRACKING_STAGES.length - 1;
+      const ship = order.shippingInfo || {};
+      const destination = [ship.city, ship.state, ship.zip].filter(Boolean).join(', ') || 'Express Delivery';
+
+      let itemsHtml = '';
+      (order.items || []).forEach((item) => {
+        itemsHtml += `
+          <div class="order-item-mini">
+            <div class="order-item-mini-left">
+              <img src="${escapeHtml(item.image || '')}" alt="${escapeHtml(item.name)}" class="order-item-mini-thumb" ${imgCorsAttr(item.image || '')} />
+              <span class="order-item-mini-title">${escapeHtml(item.name)}</span>
+              <span class="order-item-mini-qty">&times;${item.qty}</span>
+            </div>
+            <strong>${formatCurrency(item.price * item.qty)}</strong>
+          </div>
+        `;
+      });
+
+      html += `
+        <article class="order-card" data-order-id="${escapeHtml(order.id)}">
+          <div class="order-card-header">
+            <div class="order-card-id-row">
+              <span class="order-card-id">#${escapeHtml(order.id)}</span>
+              <span class="order-card-date">Placed ${escapeHtml(order.placedDate || '')}</span>
+            </div>
+            <span class="order-status-pill ${isDelivered ? 'is-delivered' : ''}">${escapeHtml(currentStage.label)}</span>
+          </div>
+
+          <div class="order-card-items">
+            ${itemsHtml}
+          </div>
+
+          <div class="order-card-footer">
+            <div class="order-card-meta">
+              <span>Ship to: ${escapeHtml(destination)}</span>
+              <span>Total Paid: <strong>${formatCurrency(order.total)}</strong></span>
+            </div>
+            <div class="order-card-actions">
+              <button type="button" class="btn btn-secondary btn-sm" data-reorder-id="${escapeHtml(order.id)}">Reorder Items</button>
+              <button type="button" class="btn btn-primary btn-sm" data-track-order-id="${escapeHtml(order.id)}">Track Status</button>
+            </div>
+          </div>
+        </article>
+      `;
+    });
+
+    dom.ordersListContainer.innerHTML = html;
+
+    dom.ordersListContainer.querySelectorAll('[data-track-order-id]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const ordId = btn.getAttribute('data-track-order-id');
+        switchAccountTab('track', ordId);
+      });
+    });
+
+    dom.ordersListContainer.querySelectorAll('[data-reorder-id]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const ordId = btn.getAttribute('data-reorder-id');
+        reorderPlacedOrder(ordId);
+      });
+    });
+  }
+
+  function reorderPlacedOrder(orderId) {
+    const order = state.orders.find((o) => o.id === orderId);
+    if (!order || !order.items || order.items.length === 0) return;
+
+    let addedCount = 0;
+    order.items.forEach((item) => {
+      const product = state.products.find((p) => p.id === item.id);
+      if (product) {
+        const existingIndex = state.cart.findIndex((c) => c.id === product.id);
+        if (existingIndex > -1) {
+          state.cart[existingIndex].qty += item.qty;
+        } else {
+          state.cart.push({ id: product.id, qty: item.qty, product });
+        }
+        addedCount++;
+      }
+    });
+
+    if (addedCount > 0) {
+      saveCartToStorage();
+      updateCartUI();
+      closeAccountModal();
+      openCartDrawer();
+      showToast(`Added items from #${order.id} to your cart`);
+    } else {
+      showToast('Ordered products are no longer in the catalog');
+    }
+  }
+
+  function normalizeOrderQuery(raw) {
+    return String(raw || '').trim().replace(/^#/, '').toUpperCase();
+  }
+
+  function renderTrackQuickChips(activeOrderId) {
+    if (!dom.trackQuickChips) return;
+    if (state.orders.length === 0) {
+      dom.trackQuickChips.innerHTML = '';
+      return;
+    }
+
+    let chipsHtml = '<span class="track-chip-label">Your Orders:</span>';
+    state.orders.slice(0, 6).forEach((ord) => {
+      const isActive = activeOrderId === ord.id;
+      chipsHtml += `
+        <button type="button" class="track-chip-btn ${isActive ? 'active' : ''}" data-quick-track-id="${escapeHtml(ord.id)}">#${escapeHtml(ord.id)}</button>
+      `;
+    });
+    dom.trackQuickChips.innerHTML = chipsHtml;
+
+    dom.trackQuickChips.querySelectorAll('[data-quick-track-id]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const id = chip.getAttribute('data-quick-track-id');
+        renderTrackOrder(id);
+      });
+    });
+  }
+
+  function renderTrackOrder(orderIdOrQuery = null) {
+    if (!dom.trackResultContainer) return;
+
+    const cleanQuery = orderIdOrQuery !== null
+      ? normalizeOrderQuery(orderIdOrQuery)
+      : (state.activeTrackingOrderId || (state.orders[0] ? state.orders[0].id : ''));
+
+    if (dom.trackOrderInput && cleanQuery) {
+      dom.trackOrderInput.value = `#${cleanQuery}`;
+    }
+
+    if (state.orders.length === 0) {
+      renderTrackQuickChips(null);
+      dom.trackResultContainer.innerHTML = `
+        <div class="account-empty-state">
+          <h4>No shipments to track yet</h4>
+          <p>Place an order first, then click Track Status to watch it progress from Order Confirmed to Delivered.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const order = state.orders.find(
+      (o) => normalizeOrderQuery(o.id) === cleanQuery || normalizeOrderQuery(o.trackingCode) === cleanQuery
+    );
+
+    if (!order) {
+      renderTrackQuickChips(state.activeTrackingOrderId);
+      dom.trackResultContainer.innerHTML = `
+        <div class="account-empty-state">
+          <h4>Order #${escapeHtml(cleanQuery)} not found</h4>
+          <p>Check the Order ID or select one of your placed orders above.</p>
+        </div>
+      `;
+      return;
+    }
+
+    state.activeTrackingOrderId = order.id;
+    renderTrackQuickChips(order.id);
+
+    const stageIdx = Math.min(Math.max(Number(order.statusStage) || 0, 0), TRACKING_STAGES.length - 1);
+    const isDelivered = stageIdx === TRACKING_STAGES.length - 1;
+    const progressPct = Math.round(((stageIdx + 1) / TRACKING_STAGES.length) * 100);
+    const ship = order.shippingInfo || {};
+    const destString = [ship.address, ship.city, ship.state, ship.zip].filter(Boolean).join(', ') || 'Customer Address';
+    const timestamps = Array.isArray(order.stageTimestamps) ? order.stageTimestamps : [];
+
+    let stepsHtml = '';
+    TRACKING_STAGES.forEach((stage, idx) => {
+      const stepClass = idx < stageIdx ? 'is-completed' : (idx === stageIdx ? 'is-current' : '');
+      const marker = idx <= stageIdx ? '✓' : String(idx + 1);
+      const timeLabel = idx <= stageIdx
+        ? (timestamps[idx] || (idx === 0 ? order.placedDate : 'Completed'))
+        : 'Upcoming';
+
+      stepsHtml += `
+        <div class="timeline-step ${stepClass}">
+          <span class="timeline-dot">${marker}</span>
+          <div>
+            <div class="timeline-step-title">${escapeHtml(stage.label)}</div>
+            <div class="timeline-step-desc">${escapeHtml(stage.detail)}</div>
+          </div>
+          <span class="timeline-step-time">${escapeHtml(timeLabel)}</span>
+        </div>
+      `;
+    });
+
+    dom.trackResultContainer.innerHTML = `
+      <div class="track-status-card">
+        <div class="track-summary-grid">
+          <div class="track-meta-cell">
+            <span>Order ID</span>
+            <strong>#${escapeHtml(order.id)}</strong>
+          </div>
+          <div class="track-meta-cell">
+            <span>Tracking Number</span>
+            <strong>${escapeHtml(order.trackingCode || ('TRK-' + order.id))}</strong>
+          </div>
+          <div class="track-meta-cell">
+            <span>Current Status</span>
+            <strong>${escapeHtml(TRACKING_STAGES[stageIdx].label)}</strong>
+          </div>
+          <div class="track-meta-cell">
+            <span>Destination</span>
+            <strong>${escapeHtml(destString)}</strong>
+          </div>
+        </div>
+
+        <div class="track-progress-track" aria-label="Delivery progress">
+          <div class="track-progress-fill" style="width: ${progressPct}%"></div>
+        </div>
+
+        <div class="tracking-timeline">
+          ${stepsHtml}
+        </div>
+
+        <div class="track-footer-actions">
+          <button type="button" id="backToOrdersListBtn" class="btn btn-secondary btn-sm">View All Placed Orders</button>
+          <button type="button" id="simulateNextStageBtn" class="btn btn-primary btn-sm" ${isDelivered ? 'disabled' : ''}>
+            ${isDelivered ? 'Delivered' : 'Simulate Next Milestone'}
+          </button>
+        </div>
+      </div>
+    `;
+
+    const backOrdersBtn = document.getElementById('backToOrdersListBtn');
+    if (backOrdersBtn) {
+      backOrdersBtn.addEventListener('click', () => switchAccountTab('orders'));
+    }
+
+    const simBtn = document.getElementById('simulateNextStageBtn');
+    if (simBtn && !isDelivered) {
+      simBtn.addEventListener('click', () => advanceOrderStatus(order.id));
+    }
+  }
+
+  function advanceOrderStatus(orderId) {
+    const order = state.orders.find((o) => o.id === orderId);
+    if (!order) return;
+
+    const currentStage = Math.min(Math.max(Number(order.statusStage) || 0, 0), TRACKING_STAGES.length - 1);
+    if (currentStage >= TRACKING_STAGES.length - 1) return;
+
+    const nextStage = currentStage + 1;
+    order.statusStage = nextStage;
+    if (!Array.isArray(order.stageTimestamps)) {
+      order.stageTimestamps = [];
+    }
+    order.stageTimestamps[nextStage] = formatTimestampShort(new Date());
+
+    saveOrdersToStorage();
+    renderPlacedOrders();
+    renderTrackOrder(order.id);
+    notifyInkInvalidate(60);
+    showToast(`Order #${order.id} updated: ${TRACKING_STAGES[nextStage].label}`);
+  }
+
+  function switchAccountTab(tabName = 'profile', orderId = null) {
+    state.activeAccountTab = tabName;
+
+    dom.accountTabs.forEach((tab) => {
+      const isActive = tab.getAttribute('data-account-tab') === tabName;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+
+    if (dom.accountProfileTab) dom.accountProfileTab.classList.toggle('hidden', tabName !== 'profile');
+    if (dom.accountOrdersTab) dom.accountOrdersTab.classList.toggle('hidden', tabName !== 'orders');
+    if (dom.accountTrackTab) dom.accountTrackTab.classList.toggle('hidden', tabName !== 'track');
+
+    if (tabName === 'profile') {
+      renderProfileTab();
+    } else if (tabName === 'orders') {
+      renderPlacedOrders();
+    } else if (tabName === 'track') {
+      const targetOrder = orderId || state.activeTrackingOrderId || (state.orders[0] ? state.orders[0].id : null);
+      renderTrackOrder(targetOrder);
+    }
+
+    notifyInkInvalidate(60);
+  }
+
+  function openAccountModal(tabName = 'profile', orderId = null) {
+    if (!dom.accountModal) return;
+    updateAccountSummaryUI();
+    dom.accountModal.classList.remove('hidden');
+    switchAccountTab(tabName, orderId);
+    notifyInkInvalidate(80);
+  }
+
+  function closeAccountModal() {
+    if (!dom.accountModal) return;
+    dom.accountModal.classList.add('hidden');
+    notifyInkInvalidate(80);
+  }
+
+  // --- Q&A / FAQ Interactive Accordion ---
+  function getFaqCategoryLabel(cat) {
+    if (cat === 'website') return 'Website & Profile';
+    if (cat === 'orders') return 'Orders & Checkout';
+    if (cat === 'tracking') return 'Track Status';
+    return 'General';
+  }
+
+  function renderFaq() {
+    if (!dom.faqAccordionList) return;
+
+    const filtered = state.activeFaqCategory === 'all'
+      ? FAQ_DATA
+      : FAQ_DATA.filter((item) => item.category === state.activeFaqCategory);
+
+    let html = '';
+    filtered.forEach((item) => {
+      const isOpen = state.openFaqIds.has(item.id);
+      html += `
+        <div class="faq-item ${isOpen ? 'is-open' : ''}" data-faq-id="${escapeHtml(item.id)}">
+          <button type="button" class="faq-question" aria-expanded="${isOpen ? 'true' : 'false'}">
+            <span class="faq-question-left">
+              <span class="faq-cat-tag">${escapeHtml(getFaqCategoryLabel(item.category))}</span>
+              <span>${escapeHtml(item.question)}</span>
+            </span>
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer ${isOpen ? '' : 'hidden'}">
+            <p>${escapeHtml(item.answer)}</p>
+            ${item.actionLabel ? `
+              <div class="faq-answer-action">
+                <button type="button" class="btn btn-secondary btn-sm" data-faq-action="${escapeHtml(item.actionType)}">${escapeHtml(item.actionLabel)}</button>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    });
+
+    dom.faqAccordionList.innerHTML = html;
+
+    dom.faqAccordionList.querySelectorAll('.faq-question').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const card = btn.closest('.faq-item');
+        if (!card) return;
+        const id = card.getAttribute('data-faq-id');
+        if (state.openFaqIds.has(id)) {
+          state.openFaqIds.delete(id);
+        } else {
+          state.openFaqIds.add(id);
+        }
+        renderFaq();
+        notifyInkInvalidate(60);
+      });
+    });
+
+    dom.faqAccordionList.querySelectorAll('[data-faq-action]').forEach((actionBtn) => {
+      actionBtn.addEventListener('click', () => {
+        const action = actionBtn.getAttribute('data-faq-action');
+        if (action === 'profile') openAccountModal('profile');
+        else if (action === 'orders') openAccountModal('orders');
+        else if (action === 'track') openAccountModal('track', state.lastPlacedOrderId || (state.orders[0] && state.orders[0].id) || null);
+      });
+    });
+  }
+
+  function setFaqCategory(category = 'all', scrollIntoView = false) {
+    state.activeFaqCategory = category;
+    dom.faqFilterButtons.forEach((btn) => {
+      const active = btn.getAttribute('data-faq-cat') === category;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+
+    if (category !== 'all') {
+      const firstMatch = FAQ_DATA.find((q) => q.category === category);
+      if (firstMatch) state.openFaqIds.add(firstMatch.id);
+    }
+
+    renderFaq();
+    notifyInkInvalidate(60);
+
+    if (scrollIntoView) {
+      const faqEl = document.getElementById('faq');
+      if (faqEl) faqEl.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   // --- Newsletter Handler ---
@@ -1170,6 +2036,16 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  function imgCorsAttr(url) {
+    return url && url.includes('images.unsplash.com') ? ' crossorigin="anonymous"' : '';
+  }
+
+  function notifyInkInvalidate(delay) {
+    if (window.LumenInk && typeof window.LumenInk.invalidate === 'function') {
+      window.LumenInk.invalidate(delay);
+    }
   }
 
   // --- Event Listeners Setup ---
@@ -1251,6 +2127,9 @@
           updateNavActiveState();
         } else if (href === '#reviews') {
           state.currentSection = 'reviews';
+          updateNavActiveState();
+        } else if (href === '#faq') {
+          state.currentSection = 'faq';
           updateNavActiveState();
         } else if (href === '#hero') {
           state.currentSection = 'catalog';
@@ -1373,6 +2252,16 @@
     dom.shippingForm.addEventListener('submit', handleShippingSubmit);
     dom.paymentForm.addEventListener('submit', handlePaymentSubmit);
 
+    const shipZipInput = document.getElementById('shipZip');
+    if (shipZipInput) {
+      shipZipInput.addEventListener('input', (e) => {
+        const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 6);
+        if (e.target.value !== digitsOnly) {
+          e.target.value = digitsOnly;
+        }
+      });
+    }
+
     dom.backToCartBtn.addEventListener('click', () => {
       closeCheckout();
       openCartDrawer();
@@ -1382,9 +2271,118 @@
       setCheckoutStep(1);
     });
 
+    if (dom.confirmedTrackBtn) {
+      dom.confirmedTrackBtn.addEventListener('click', () => {
+        const orderId = state.lastPlacedOrderId;
+        closeCheckout();
+        openAccountModal('track', orderId);
+      });
+    }
+
     dom.confirmedContinueBtn.addEventListener('click', () => {
       closeCheckout();
       document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Customer Account Portal (Profile / Placed Orders / Track Status)
+    if (dom.accountBtn) {
+      dom.accountBtn.addEventListener('click', () => {
+        const defaultTab = state.orders.length > 0 && !state.profile.email ? 'orders' : 'profile';
+        openAccountModal(defaultTab);
+      });
+    }
+
+    if (dom.closeAccountBtn) {
+      dom.closeAccountBtn.addEventListener('click', closeAccountModal);
+    }
+
+    if (dom.accountModal) {
+      dom.accountModal.addEventListener('click', (e) => {
+        if (e.target === dom.accountModal) closeAccountModal();
+      });
+    }
+
+    dom.accountTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-account-tab') || 'profile';
+        switchAccountTab(tabName);
+      });
+    });
+
+    if (dom.profileForm) {
+      dom.profileForm.addEventListener('submit', handleProfileSubmit);
+    }
+
+    if (dom.profileZip) {
+      dom.profileZip.addEventListener('input', (e) => {
+        const digitsOnly = sanitizeZip(e.target.value);
+        if (e.target.value !== digitsOnly) {
+          e.target.value = digitsOnly;
+        }
+      });
+    }
+
+    if (dom.clearProfileBtn) {
+      dom.clearProfileBtn.addEventListener('click', clearSavedProfile);
+    }
+
+    if (dom.ordersOpenTrackBtn) {
+      dom.ordersOpenTrackBtn.addEventListener('click', () => {
+        switchAccountTab('track', state.lastPlacedOrderId || (state.orders[0] && state.orders[0].id) || null);
+      });
+    }
+
+    if (dom.trackOrderForm) {
+      dom.trackOrderForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        renderTrackOrder(dom.trackOrderInput ? dom.trackOrderInput.value : '');
+        notifyInkInvalidate(60);
+      });
+    }
+
+    // Q&A / FAQ Filters & Quick Actions
+    dom.faqFilterButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const cat = btn.getAttribute('data-faq-cat') || 'all';
+        setFaqCategory(cat, false);
+      });
+    });
+
+    if (dom.faqOpenProfileBtn) {
+      dom.faqOpenProfileBtn.addEventListener('click', () => openAccountModal('profile'));
+    }
+
+    if (dom.faqOpenOrdersBtn) {
+      dom.faqOpenOrdersBtn.addEventListener('click', () => openAccountModal('orders'));
+    }
+
+    if (dom.faqOpenTrackBtn) {
+      dom.faqOpenTrackBtn.addEventListener('click', () => {
+        openAccountModal('track', state.lastPlacedOrderId || (state.orders[0] && state.orders[0].id) || null);
+      });
+    }
+
+    // Footer Customer Care Triggers
+    if (dom.footerProfileTrigger) {
+      dom.footerProfileTrigger.addEventListener('click', () => openAccountModal('profile'));
+    }
+
+    if (dom.footerOrdersTrigger) {
+      dom.footerOrdersTrigger.addEventListener('click', () => openAccountModal('orders'));
+    }
+
+    if (dom.footerTrackTrigger) {
+      dom.footerTrackTrigger.addEventListener('click', () => {
+        openAccountModal('track', state.lastPlacedOrderId || (state.orders[0] && state.orders[0].id) || null);
+      });
+    }
+
+    document.querySelectorAll('[data-faq-jump]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const cat = link.getAttribute('data-faq-jump') || 'all';
+        setFaqCategory(cat, true);
+      });
     });
 
     // Newsletter Form
@@ -1397,6 +2395,7 @@
         if (!dom.checkoutModal.classList.contains('hidden')) closeCheckout();
         if (!dom.passcodeModal.classList.contains('hidden')) closePasscodePrompt();
         if (!dom.adminModal.classList.contains('hidden')) closeAdminModal();
+        if (dom.accountModal && !dom.accountModal.classList.contains('hidden')) closeAccountModal();
         if (dom.cartDrawer.classList.contains('open')) closeCartDrawer();
       }
     });
@@ -1418,6 +2417,12 @@
     if (state.currentSection === 'reviews') {
       const reviewsLink = document.querySelector('.nav-links a[href="#reviews"]');
       if (reviewsLink) reviewsLink.classList.add('active');
+      return;
+    }
+
+    if (state.currentSection === 'faq') {
+      const faqLink = document.querySelector('.nav-links a[href="#faq"]');
+      if (faqLink) faqLink.classList.add('active');
       return;
     }
 
@@ -1469,7 +2474,8 @@
       { id: 'hero', section: 'catalog' },
       { id: 'catalog', section: 'catalog' },
       { id: 'story', section: 'story' },
-      { id: 'reviews', section: 'reviews' }
+      { id: 'reviews', section: 'reviews' },
+      { id: 'faq', section: 'faq' }
     ];
 
     const observer = new IntersectionObserver((entries) => {
@@ -1585,9 +2591,13 @@
   function init() {
     loadProducts();
     loadCartFromStorage();
+    loadProfileFromStorage();
+    loadOrdersFromStorage();
     renderCatalog();
     renderTestimonials();
+    renderFaq();
     updateCartUI();
+    updateAccountSummaryUI();
     setupEventListeners();
     updateNavActiveState();
     initSectionScrollSpy();

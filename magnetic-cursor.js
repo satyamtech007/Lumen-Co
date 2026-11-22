@@ -52,8 +52,15 @@
   let isTextInput = false;
   let isVisible = false;
   let activeMagneticEl = null;
-  let magneticElBounds = null;
+  let magneticElCenter = null;
+  let boundsDirty = false;
   let rafId = null;
+
+  function wakeLoop() {
+    if (!rafId) {
+      rafId = requestAnimationFrame(renderLoop);
+    }
+  }
 
   // DOM Elements
   let cursorEl = null;
@@ -67,11 +74,13 @@
     cursorEl = document.createElement('div');
     cursorEl.className = 'magnetic-cursor-follower';
     cursorEl.setAttribute('aria-hidden', 'true');
+    cursorEl.setAttribute('data-html2canvas-ignore', '');
 
     // Precision micro-dot
     dotEl = document.createElement('div');
     dotEl.className = 'magnetic-cursor-dot';
     dotEl.setAttribute('aria-hidden', 'true');
+    dotEl.setAttribute('data-html2canvas-ignore', '');
 
     document.body.appendChild(cursorEl);
     document.body.appendChild(dotEl);
@@ -141,22 +150,28 @@
     const magTarget = getMagneticTarget(e.target);
 
     if (magTarget) {
-      if (activeMagneticEl !== magTarget) {
-        if (activeMagneticEl) {
+      if (activeMagneticEl !== magTarget || boundsDirty || !magneticElCenter) {
+        if (activeMagneticEl && activeMagneticEl !== magTarget) {
           resetElementTransform(activeMagneticEl);
         }
         activeMagneticEl = magTarget;
+        // Measure resting center without pull transform so cached bounds never drift
+        const prevTransform = activeMagneticEl.style.transform;
+        activeMagneticEl.style.transform = 'none';
+        const rect = activeMagneticEl.getBoundingClientRect();
+        activeMagneticEl.style.transform = prevTransform;
+        magneticElCenter = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        };
+        boundsDirty = false;
         isHovering = true;
         cursorEl.classList.add('is-hovering');
       }
 
-      magneticElBounds = activeMagneticEl.getBoundingClientRect();
-      const elCenterX = magneticElBounds.left + magneticElBounds.width / 2;
-      const elCenterY = magneticElBounds.top + magneticElBounds.height / 2;
-
-      // Distance from pointer to element center
-      const deltaX = mouse.x - elCenterX;
-      const deltaY = mouse.y - elCenterY;
+      // Distance from pointer to resting element center
+      const deltaX = mouse.x - magneticElCenter.x;
+      const deltaY = mouse.y - magneticElCenter.y;
 
       // Cursor snaps towards center with magneticFactor (0.55)
       target.x = mouse.x - deltaX * CONFIG.magneticFactor;
@@ -171,7 +186,7 @@
       if (activeMagneticEl) {
         resetElementTransform(activeMagneticEl);
         activeMagneticEl = null;
-        magneticElBounds = null;
+        magneticElCenter = null;
       }
 
       // Check general interactive hover for scaling cursor
@@ -184,6 +199,8 @@
       target.x = mouse.x;
       target.y = mouse.y;
     }
+
+    wakeLoop();
   }
 
   // Smooth spring reset when pointer leaves magnetic element
@@ -203,11 +220,13 @@
   function onMouseDown() {
     isClicking = true;
     cursorEl.classList.add('is-clicking');
+    wakeLoop();
   }
 
   function onMouseUp() {
     isClicking = false;
     cursorEl.classList.remove('is-clicking');
+    wakeLoop();
   }
 
   // Window leave / enter handlers
@@ -218,6 +237,7 @@
     if (activeMagneticEl) {
       resetElementTransform(activeMagneticEl);
       activeMagneticEl = null;
+      magneticElCenter = null;
     }
   }
 
@@ -225,42 +245,48 @@
     isVisible = true;
     cursorEl.classList.add('is-active');
     dotEl.classList.add('is-active');
+    wakeLoop();
   }
 
-  // Physics Animation Loop
+  // Physics Animation Loop (sleeps automatically once settled)
   function renderLoop() {
-    if (isVisible) {
-      const prevX = cursor.x;
-      const prevY = cursor.y;
+    rafId = null;
+    if (!isVisible) return;
 
-      // Smooth position interpolation
-      cursor.x = lerp(cursor.x, target.x, CONFIG.lerpFactor);
-      cursor.y = lerp(cursor.y, target.y, CONFIG.lerpFactor);
+    const prevX = cursor.x;
+    const prevY = cursor.y;
 
-      velocity.x = cursor.x - prevX;
-      velocity.y = cursor.y - prevY;
+    cursor.x = lerp(cursor.x, target.x, CONFIG.lerpFactor);
+    cursor.y = lerp(cursor.y, target.y, CONFIG.lerpFactor);
 
-      const speed = Math.hypot(velocity.x, velocity.y);
+    velocity.x = cursor.x - prevX;
+    velocity.y = cursor.y - prevY;
 
-      // Base translation
-      let transformStr = `translate3d(${cursor.x}px, ${cursor.y}px, 0)`;
+    const speed = Math.hypot(velocity.x, velocity.y);
+    const remaining = Math.hypot(target.x - cursor.x, target.y - cursor.y);
 
-      // Fluid velocity stretch along movement vector
-      if (!prefersReducedMotion() && speed > 0.6 && !isHovering && !isTextInput) {
-        const angle = Math.atan2(velocity.y, velocity.x);
-        const stretch = Math.min(speed * 0.012, 0.32);
-        const scaleX = 1 + stretch;
-        const scaleY = 1 - stretch * 0.5;
-        transformStr += ` rotate(${angle}rad) scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
-      } else if (isClicking) {
-        transformStr += ' scale(0.82)';
-      }
-
-      cursorEl.style.transform = transformStr;
-
-      // Inner micro-dot directly tracks exact mouse coordinates
+    if (remaining < 0.08 && speed < 0.08) {
+      cursor.x = target.x;
+      cursor.y = target.y;
+      cursorEl.style.transform = `translate3d(${cursor.x}px, ${cursor.y}px, 0)${isClicking ? ' scale(0.82)' : ''}`;
       dotEl.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0)`;
+      return;
     }
+
+    let transformStr = `translate3d(${cursor.x}px, ${cursor.y}px, 0)`;
+
+    if (!prefersReducedMotion() && speed > 0.6 && !isHovering && !isTextInput) {
+      const angle = Math.atan2(velocity.y, velocity.x);
+      const stretch = Math.min(speed * 0.012, 0.32);
+      const scaleX = 1 + stretch;
+      const scaleY = 1 - stretch * 0.5;
+      transformStr += ` rotate(${angle}rad) scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
+    } else if (isClicking) {
+      transformStr += ' scale(0.82)';
+    }
+
+    cursorEl.style.transform = transformStr;
+    dotEl.style.transform = `translate3d(${mouse.x}px, ${mouse.y}px, 0)`;
 
     rafId = requestAnimationFrame(renderLoop);
   }
@@ -275,14 +301,8 @@
     document.documentElement.addEventListener('mouseleave', onMouseLeave, { passive: true });
     document.documentElement.addEventListener('mouseenter', onMouseEnter, { passive: true });
 
-    // Keep bounds accurate on scroll
-    window.addEventListener('scroll', () => {
-      if (activeMagneticEl) {
-        magneticElBounds = activeMagneticEl.getBoundingClientRect();
-      }
-    }, { passive: true });
-
-    rafId = requestAnimationFrame(renderLoop);
+    window.addEventListener('scroll', () => { boundsDirty = true; }, { passive: true });
+    window.addEventListener('resize', () => { boundsDirty = true; }, { passive: true });
   }
 
   if (document.readyState === 'loading') {
